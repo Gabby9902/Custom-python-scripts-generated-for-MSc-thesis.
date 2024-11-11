@@ -1,77 +1,110 @@
 Estimation of evolutionary divergence
-1. Identifying the orthologs (common genes) using OMA standalone
-1.1. Install OMA.2.6.0
-wget -O oma.tgz https://omabrowser.org/standalone/OMA.2.6.0.tgz
-1.2. Open the file
-tar xvzf oma.tgz
-1.3. Change directory into the OMA folder using the cd command
-1.4. Generate a log folder for running OMA
-1.4.1. modify the command to your profile
-mkdir logs ./install.sh /home/îuser_nameî
+A. Identifying the orthologs (common genes) using OMA standalone
+1. Install OMA.2.6.0
+    wget -O oma.tgz https://omabrowser.org/standalone/OMA.2.6.0.tgz
+
+1.1. Open the file
+    tar xvzf oma.tgz
+
+1.2. Change directory into the OMA folder using the cd command
+
+1.3. Generate a log folder for running OMA
+
+1.4. Modify the command to your profile
+    mkdir logs ./install.sh /home/‚Äùuser_name‚Äù
+
 2. Preparing your genome files
 2.1. Manually copy all amino acid sequences (*.faa) files from our genomes to the database (DB) folder
+
 2.2. Convert the amino acid sequence files in *.faa format into *.fa format
-for f in *.faa; do mv -- "$f" "${f%.faa}.fa"; done
+    for f in *.faa; do mv -- "$f" "${f%.faa}.fa"; done
+
 2.3. Modify the OMA_part1.sh, OMA_part2.sh and OMA_part3.sh scripts as necessary
+
 2.4. Change directory into the location of the OMA.2.6.0 programme using the cd command
+
 2.5. Run the OMA scripts one at a time
-sbatch OMA_part1.sh
-sbatch OMA_part2.sh
-sbatch OMA_part3.sh
-2.6. Run the count_entries.py script to determine the number of orthologs. (Outputs are stored in a file named ìlist_filesî)
-python count_entries.py
-2.7. Transfer the shared orthologs to a new folder called ìCommon_OGsî
-rsync -aSvuc `cat list_of_files` Common_OGs/
+    sbatch OMA_part1.sh
+    sbatch OMA_part2.sh
+    sbatch OMA_part3.sh
+
+2.6. Run the count_entries.py script to determine the number of orthologs. (Outputs are stored in a file named ‚Äúlist_files‚Äù)
+    python count_entries.py
+
+2.7. Transfer the shared orthologs to a new folder called ‚ÄúCommon_OGs‚Äù
+    rsync -aSvuc `cat list_of_files` Common_OGs/
+
 2.8. Enter the Common_OGs folder using the cd command
+
 2.9. Remove [ ] brackets from orthologous genes fasta file names
-for i in *.fa; do sed 's/\[[^]]*\]//g' $i > ${i/.fa/edited.fa};done
+    for i in *.fa; do sed 's/\[[^]]*\]//g' $i > ${i/.fa/edited.fa};done
+
 2.10. Upload the corresponding nucleotide files(*.ffn) for all the amino acid sequences in each of the MAGs and genomes into a separate folder within the folder containing the common orthologs (call it something like FNN_files).
+
 2.11. Concatenate all the ffn files into a single file
-cat *.ffn > All_seqs.ffn
+    cat *.ffn > All_seqs.ffn
+
 3. Aligning orthologs using MUSCLE to ensure that they are the same length
 3.1. Install MUSCLE
-conda create -n  muscle
-conda activate muscle
-conda install -c muscle
-3.2. Run the muscle.sh script 
-sbatch muscle.sh
-4. Grouping the amino acid sequences for each OG into a single file for each genome will that genomeís OGs
-4.1. Run the merge_fastas_for_dSdN.py script to cluster sequences into new genome fasta files
-python merge_fastas_for_dSdN.py /home/gabby/OMA.2.6.0/Output/OrthologousGroupsFasta/Common_OGs aln text_file_listing_genomes_one_per_line
-5. Retrieving the corresponding nucleotide sequences for the amino acid sequences of each genomeís OG
-5.1. Run the streamlined_seqretriever.py script to extract nucleotide sequences corresponding to OGs
-5.2. Modify the directories for input and output files as appropriate in the below command python streamlined_seqretriever.py /home/îuser_nameî/OMA.2.6.0/Output/OrthologousGroupsFasta/Common_OGs /home/îuser_nameî/OMA.2.6.0/Output/OrthologousGroupsFasta/Common_OGs/FFN/All_seqs.ffn
-5.3. Run the remove_stop_codons.py script to remove the stop codons from the nucleotide files for each genomeís OGs
-5.4. Modify the directories for input file as appropriate in the below command  
-python remove_stop_codons.py /home/îuser_nameî/OMA.2.6.0/Output/OrthologousGroupsFasta/Common_OGs/FFN
-6. Merging all the amino acid sequences for each OG into a single ìsuper geneî for each genome
-6.1. Install Emboss using conda
-conda config --add channels bioconda
-conda config --add channels conda-forge
-conda install bioconda::emboss
+    conda create -n  muscle
+    conda activate muscle
+    conda install -c muscle
 
-6.2. Concatenate all protein and nucleotide sequences per genome to create ìsuper genesî
-for file in `ls *multifasta.aln`; do union -filter ${file} > ${file/multifasta.aln/_merged.fa} done
-6.3. Concatenate all ìsuper genesî into a single *.faa file and a single *.ffn file
-cat *_merged.fa > Final.faa
-cat *_merged.fasta > Final.fasta
-7. Aligning the amino acid and nucleotide sequences of the ìsuper genesî using Pal2Nal
+3.2. Run the muscle.sh script 
+    sbatch muscle.sh
+
+4. Grouping the amino acid sequences for each OG into a single file for each genome will that genome‚Äôs OGs
+4.1. Run the merge_fastas_for_dSdN.py script to cluster sequences into new genome fasta files
+    python merge_fastas_for_dSdN.py /home/gabby/OMA.2.6.0/Output/OrthologousGroupsFasta/Common_OGs aln text_file_listing_genomes_one_per_line
+
+5. Retrieving the corresponding nucleotide sequences for the amino acid sequences of each genome‚Äôs OG
+
+5.1. Run the streamlined_seqretriever.py script to extract nucleotide sequences corresponding to OGs
+
+5.2. Modify the directories for input and output files as appropriate in the below command 
+    python streamlined_seqretriever.py /home/‚Äùuser_name‚Äù/OMA.2.6.0/Output/OrthologousGroupsFasta/Common_OGs /home/‚Äùuser_name‚Äù/OMA.2.6.0/Output/OrthologousGroupsFasta/Common_OGs/FFN/All_seqs.ffn
+
+5.3. Run the remove_stop_codons.py script to remove the stop codons from the nucleotide files for each genome‚Äôs OGs
+
+5.4. Modify the directories for input file as appropriate in the below command  
+    python remove_stop_codons.py /home/‚Äùuser_name‚Äù/OMA.2.6.0/Output/OrthologousGroupsFasta/Common_OGs/FFN
+
+6. Merging all the amino acid sequences for each OG into a single ‚Äúsuper gene‚Äù for each genome
+6.1. Install Emboss using conda
+    conda config --add channels bioconda
+    conda config --add channels conda-forge
+    conda install bioconda::emboss
+
+6.2. Concatenate all protein and nucleotide sequences per genome to create ‚Äúsuper genes‚Äù
+    for file in `ls *multifasta.aln`; do union -filter ${file} > ${file/multifasta.aln/_merged.fa} done
+
+6.3. Concatenate all ‚Äúsuper genes‚Äù into a single *.faa file and a single *.ffn file
+    cat *_merged.fa > Final.faa
+    cat *_merged.fasta > Final.fasta
+
+7. Aligning the amino acid and nucleotide sequences of the ‚Äúsuper genes‚Äù using Pal2Nal
 7.1. Install Pal2Nal
-conda create -n pal2nal
-conda activate pal2nal
-conda install -c bioconda pal2nal
+    conda create -n pal2nal
+    conda activate pal2nal
+    conda install -c bioconda pal2nal
+
 7.2. Run the pal2nal.sh script 
-sbatch pal2nal.sh
+    sbatch pal2nal.sh
+
 8. Calculating the rate of synonymous substitutions for each OG using PAML
 8.1. Install PAML using conda
-conda create -n paml
-conda activate paml
-conda install -c bioconda paml
+    conda create -n paml
+    conda activate paml
+    conda install -c bioconda paml
+
 8.2. Run the all_control_file.ctl script to generate a control file for PAML
 This script should be manually modified according to your assembly requirements for PAML
+
 8.3. Run the paml.sh script 
-sbatch paml.sh
+    sbatch paml.sh
+
 8.4. Generate a phylogenetic tree of the estimated evolutionary divergences of the OGs using RaxML (raxml is installed as part of the phylophlan package)
-conda activate phylophlan 
+    conda activate phylophlan 
+
 8.5. Run the Raxml_tree.sh script sbatch raxml_tree.sh
 
