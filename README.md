@@ -1,5 +1,6 @@
 All batch scripts, R scripts and installation commands required for the completion of my MSc (Microbiology) degree.
 Scripts and installation instructions are listed according to which part of the research workflow they fall under.
+(Inputs for some custom scripts and programmes can be found in the 'Custom scripts input data' folder)
 
 Metagenome Assembly and Binning
 QUAST
