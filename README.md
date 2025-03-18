@@ -9,6 +9,7 @@ conda activate quast_env
 conda install -y -c bioconda quast
 quast “scaffold_name”.fasta > Quast.output
 
+
 AUTOMETA
 Installation
 conda create -y -n autometa
@@ -16,6 +17,7 @@ conda activate autometa
 conda install -y -c bioconda -c conda-forge autometa
 autometa-config --section databases --option markers --value /home/sam/Databases/autometa_markers #Note: Leave this path as is, do not change it to your user name
 autometa-config --section databases --option ncbi –value /home/sam/Databases/autometa_ncbi_sam #Same here - leave it as is
+
 Running
 sbatch autometa_flagged.sh \
 -o /path/to/where/output/should/go \
@@ -24,6 +26,7 @@ sbatch autometa_flagged.sh \
 -n /home/sam/Databases/autometa_ncbi_sam \
 -m /home/sam/Databases/autometa_markers \
 -l 3000 -v spades -c 8
+
 
 CHECKM
 create -y -n checkm2 -c bioconda -c conda-forge checkm2 'python>=3.7, <3.9'
@@ -51,6 +54,15 @@ conda create -n fastANI
 conda activate fastANI
 conda install -c bioconda fastANI
 fastANI --threads 2 --ql querylist.txt --rl reflist.txt --matrix -o fastani.out
+
+BARRNAP 0.9
+Installation
+conda create -n barrnap
+conda activate barrnap
+conda install -c bioconda -c conda-forge barrnap
+conda deactivate
+
+for genome in `ls *.fasta`; do barrnap -k bac ${genome} --outseq ${genome/.fasta/_RNAs.fasta};done 
 
 ANICLUSTERMAP
 conda create --name aniclustermap -c conda-forge aniclustermap
