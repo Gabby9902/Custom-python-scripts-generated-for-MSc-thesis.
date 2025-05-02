@@ -27,6 +27,9 @@ sbatch autometa_flagged.sh \
 -m /home/sam/Databases/autometa_markers \
 -l 3000 -v spades -c 8
 
+Converting fna files to fasta files
+for f in *.fna; do mv -- "$f" "${f%.fna}.fasta";done 
+
 
 CHECKM
 create -y -n checkm2 -c bioconda -c conda-forge checkm2 'python>=3.7, <3.9'
